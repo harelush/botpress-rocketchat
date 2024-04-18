@@ -15,12 +15,23 @@ if (fs.existsSync(configFile)) {
   config = require('./' + configFile);
 } else {
   console.log(`"${configFile}" file not found, checking for environment variables...`);
+
   for (const variable of variables.concat(Object.keys(optionalVariables))) {
-    const value = process.env[variable];
+    let value = process.env[variable];
     if (value !== undefined) {
+      // Convert to number if possible
+      if (!isNaN(value)) {
+        value = Number(value);
+      }
+      // Convert to boolean if value is 'true' or 'false'
+      else if (value.toLowerCase() === 'true') {
+        value = true;
+      } else if (value.toLowerCase() === 'false') {
+        value = false;
+      }
+      // Assign the possibly converted value to the config object
       config[variable] = value;
     }
-  }
 }
 
 for (const [optionalVariable, defaultValue] of Object.entries(optionalVariables)) {
