@@ -35,7 +35,7 @@ async function sendTextMessage(response, roomId) {
 
 async function sendImageMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(''), roomId);
-  const imageUrl = createImageUrl(response.image);
+  const imageUrl = createUrlForEmulator(response.image);
   const attachment = createImageAttachment(response.title, imageUrl);
   msg.attachments = [attachment];
 
@@ -44,7 +44,7 @@ async function sendImageMessage(response, roomId) {
 
 async function sendFileMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(''), roomId);
-  const fileUrl = createImageUrl(response.file);
+  const fileUrl = createUrlForEmulator(response.file);
   const attachment = createFileAttachment(response.title, fileUrl);
   msg.attachments = [attachment];
 
@@ -137,7 +137,7 @@ function createFileAttachment(title, url) {
   return attachment;
 }
 
-function createImageUrl(url) {
+function createUrlForEmulator(url) {
   const splitedUrl = url.split('/');
 
   return url.replace(splitedUrl[2], '10.0.2.2:8000');
