@@ -8,6 +8,12 @@ async function sendMessage(response, roomId) {
   if (response.type === 'text') {
     // Simple text message
     return await sendTextMessage(response, roomId);
+  }else if (response.type === 'image') {
+    return await sendImageMessage(response, roomId);
+  }else if (response.type === 'single-choice') {
+    return await sendSingleChoiceMessage(response, roomId);
+  }else if (response.type === 'file') {
+    return await sendFileMessage(response, roomId);
   } else if (response.type === 'carousel') {
     // Carousel message
     return await sendCarouselMessage(response, roomId);
@@ -18,13 +24,41 @@ async function sendMessage(response, roomId) {
     } else if (response.component === 'Dropdown') {
       // Dropdown message
       return await sendDropdownMessage(response, roomId);
-    }
+    } 
   }
 }
 
 async function sendTextMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(response.text), roomId);
   return await driver.sendMessage(msg);
+}
+
+async function sendImageMessage(response, roomId) {
+  const msg = await driver.prepareMessage(he.decode(''), roomId);
+  const imageUrl = createImageUrl(response.image);
+  const attachment = createImageAttachment(response.title, imageUrl);
+  msg.attachments = [attachment];
+
+  return await driver.sendMessage(msg);
+}
+
+async function sendFileMessage(response, roomId) {
+  const msg = await driver.prepareMessage(he.decode(''), roomId);
+  const fileUrl = createImageUrl(response.file);
+  const attachment = createFileAttachment(response.title, fileUrl);
+  msg.attachments = [attachment];
+
+  return await driver.sendMessage(msg);
+}
+
+async function sendSingleChoiceMessage(response,roomId){
+  const msg = await driver.prepareMessage(he.decode(response.text), roomId);
+  const singleChoice={
+    title:response.dropdownPlaceholder,
+    options:response.choices
+  }
+  msg.singleChoice=singleChoice;
+  return await driver.sendMessage(msg)
 }
 
 async function sendCarouselMessage(response, roomId) {
@@ -85,5 +119,29 @@ function createButtons(title, replies) {
 
   return attachment;
 }
+
+function createImageAttachment(title, url) {
+  const attachment = {};
+  attachment.title = title;
+  attachment.image_url = url;
+
+  return attachment;
+}
+
+function createFileAttachment(title, url) {
+  const attachment = {};
+  attachment.title = title;
+  attachment.title_link = url;
+  attachment.title_link_download = true;
+
+  return attachment;
+}
+
+function createImageUrl(url) {
+  const splitedUrl = url.split('/');
+
+  return url.replace(splitedUrl[2], '10.0.2.2:8000');
+}
+
 
 exports.sendMessage = sendMessage;
