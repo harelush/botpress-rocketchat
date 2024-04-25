@@ -32,15 +32,18 @@ async function sendMessage(response, roomId) {
 
 async function sendTextMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(response.text), roomId);
+
   return await driver.sendMessage(msg);
 }
 
 async function sendImageMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(''), roomId);
   let imageUrl = response.image;
+
   if (config.ENVIROMENT == "dev") {
     imageUrl = createUrlForEmulator(imageUrl);
   }
+
   const attachment = {title: response.title, image_url: imageUrl};
   msg.attachments = [attachment];
 
@@ -50,9 +53,11 @@ async function sendImageMessage(response, roomId) {
 async function sendFileMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(''), roomId);
   let fileUrl = response.file;
+
   if (config.ENVIROMENT == "dev") {
     fileUrl = createUrlForEmulator(fileUrl);
   }
+  
   const attachment = {title: response.title, title_link: fileUrl};
   msg.attachments = [attachment];
 
@@ -62,9 +67,11 @@ async function sendFileMessage(response, roomId) {
 async function sendVideoMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(''), roomId);
   let videoUrl = response.video;
+
   if (config.ENVIROMENT == "dev") {
     videoUrl = createUrlForEmulator(videoUrl);
   }
+
   const splitedVideoUrl = videoUrl.split('.');
   const videoType = splitedVideoUrl[splitedVideoUrl.length - 1];
   const attachment = {title: response.title, video_url: videoUrl, video_type: `video/${videoType}`};
@@ -80,16 +87,19 @@ async function sendSingleChoiceMessage(response,roomId){
     options:response.choices
   }
   msg.singleChoice=singleChoice;
+
   return await driver.sendMessage(msg)
 }
 
 async function sendCarouselMessage(response, roomId) {
   const msg = await driver.prepareMessage(response.text, roomId);
   const attachments = [];
+
   for (const element of response.elements) {
     const attachment = createButtons(element.title, element.buttons);
     attachments.push(attachment);
   }
+
   msg.attachments = attachments;
 
   return await driver.sendMessage(msg);
@@ -145,8 +155,7 @@ function createButtons(title, replies) {
 function createUrlForEmulator(url) {
   const botpressUrl = "http://localhost:3000";
   const emulatorUrl = "http://10.0.2.2:8000";
-
-  console.log(url.replace(botpressUrl, emulatorUrl))
+  
   return url.replace(botpressUrl, emulatorUrl);
 }
 
