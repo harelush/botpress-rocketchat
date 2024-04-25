@@ -14,6 +14,8 @@ async function sendMessage(response, roomId) {
     return await sendSingleChoiceMessage(response, roomId);
   }else if (response.type === 'file') {
     return await sendFileMessage(response, roomId);
+  }else if (response.type === 'video') {
+    return await sendVideoMessage(response, roomId);
   } else if (response.type === 'carousel') {
     // Carousel message
     return await sendCarouselMessage(response, roomId);
@@ -35,8 +37,11 @@ async function sendTextMessage(response, roomId) {
 
 async function sendImageMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(''), roomId);
-  const imageUrl = createUrlForEmulator(response.image);
-  const attachment = createImageAttachment(response.title, imageUrl);
+  let imageUrl = response.image;
+  if (config.ENVIROMENT == "dev") {
+    imageUrl = createUrlForEmulator(imageUrl);
+  }
+  const attachment = {title: response.title, image_url: imageUrl};
   msg.attachments = [attachment];
 
   return await driver.sendMessage(msg);
@@ -44,8 +49,25 @@ async function sendImageMessage(response, roomId) {
 
 async function sendFileMessage(response, roomId) {
   const msg = await driver.prepareMessage(he.decode(''), roomId);
-  const fileUrl = createUrlForEmulator(response.file);
-  const attachment = createFileAttachment(response.title, fileUrl);
+  let fileUrl = response.file;
+  if (config.ENVIROMENT == "dev") {
+    fileUrl = createUrlForEmulator(fileUrl);
+  }
+  const attachment = {title: response.title, title_link: fileUrl};
+  msg.attachments = [attachment];
+
+  return await driver.sendMessage(msg);
+}
+
+async function sendVideoMessage(response, roomId) {
+  const msg = await driver.prepareMessage(he.decode(''), roomId);
+  let videoUrl = response.video;
+  if (config.ENVIROMENT == "dev") {
+    videoUrl = createUrlForEmulator(videoUrl);
+  }
+  const splitedVideoUrl = videoUrl.split('.');
+  const videoType = splitedVideoUrl[splitedVideoUrl.length - 1];
+  const attachment = {title: response.title, video_url: videoUrl, video_type: `video/${videoType}`};
   msg.attachments = [attachment];
 
   return await driver.sendMessage(msg);
@@ -120,27 +142,12 @@ function createButtons(title, replies) {
   return attachment;
 }
 
-function createImageAttachment(title, url) {
-  const attachment = {};
-  attachment.title = title;
-  attachment.image_url = url;
-
-  return attachment;
-}
-
-function createFileAttachment(title, url) {
-  const attachment = {};
-  attachment.title = title;
-  attachment.title_link = url;
-  attachment.title_link_download = true;
-
-  return attachment;
-}
-
 function createUrlForEmulator(url) {
-  const splitedUrl = url.split('/');
+  const botpressUrl = "http://localhost:3000";
+  const emulatorUrl = "http://10.0.2.2:8000";
 
-  return url.replace(splitedUrl[2], '10.0.2.2:8000');
+  console.log(url.replace(botpressUrl, emulatorUrl))
+  return url.replace(botpressUrl, emulatorUrl);
 }
 
 

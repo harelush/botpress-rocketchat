@@ -1,0 +1,9 @@
+{
+"BOTPRESS_URL": "http://localhost:8000",
+"BOTPRESS_BOT":"shira-bot",
+"ROCKETCHAT_HOST": "localhost:3000",
+"ROCKETCHAT_USERNAME":"ran", 
+"ROCKETCHAT_PASSWORD": "ran",
+"ROCKETCHAT_SSL": false,
+"ENVIROMENT": "dev"
+}
