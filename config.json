@@ -1,0 +1,9 @@
+{
+"BOTPRESS_URL": "http://localhost:8000",
+"BOTPRESS_BOT":"",
+"ROCKETCHAT_HOST": "localhost:3000",
+"ROCKETCHAT_USERNAME":"", 
+"ROCKETCHAT_PASSWORD": "",
+"ROCKETCHAT_SSL": false,
+"ENVIROMENT": "dev"
+}
